@@ -3,7 +3,13 @@ import express, { Application } from 'express';
 import { createServer, Server as ServerNode } from 'http';
 import morgan from 'morgan';
 import db from '../connection/db';
-import { ApiPaths } from './src/routes';
+import { ApiPaths } from '../routes';
+import dotenv from 'dotenv'
+import fsPromises from 'fs/promises';
+import fs from 'fs';
+import path from 'path'
+
+dotenv.config()
 
 export class Server {
     private app: Application;
@@ -22,8 +28,6 @@ export class Server {
         try {
             await db.authenticate();
             await db.sync({ alter: true });
-            // await db.sync({ force: true });
-            // await db.sync();
             console.log('Database online');
         } catch (error) {
             throw new Error(error as string);
@@ -39,9 +43,16 @@ export class Server {
 
     routes() {
         ApiPaths.forEach(async ({ url, router }) => {
-            const routeModule = await import(`./src/router/${router}.ts`);
+            const filePath = path.resolve(__dirname, '../routes', `${router}.ts`);
 
-            this.app.use(`/api${url}`, routeModule.default || routeModule);
+            try {
+                await fsPromises.access(filePath, fs.constants.F_OK);
+
+                const routeModule = await import(filePath.toString());
+                this.app.use(`/api${url}`, routeModule.default || routeModule);
+            } catch (error) {
+                console.error(`El archivo ${filePath} no existe o no es accesible:`, error.message);
+            }
         });
     }
 
