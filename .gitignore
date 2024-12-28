@@ -1,0 +1,10 @@
+dist/
+build/
+node_modules/
+.idx/
+.env
+private/profile/
+private/voucher/
+.vscode/
+tmp/
+.vercel
