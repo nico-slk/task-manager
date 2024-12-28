@@ -91,6 +91,13 @@ const createTask = async (req: Request, res: Response) => {
   try {
     const task = await TaskModel.create({ title, description, userId })
 
+    if (!title) {
+      return res.status(404).json({
+        success: false,
+        message: 'Title should not be empty.',
+      })
+    }
+
     return res.status(201).json({
       success: true,
       data: task,
