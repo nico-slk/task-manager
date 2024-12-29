@@ -1,28 +1,24 @@
 import dotenv from 'dotenv'
-import * as mysql2 from 'mysql2'
-import { Sequelize } from 'sequelize'
+import mongoose from 'mongoose'
 
 dotenv.config()
 
-const { MYSQL_DATABASE, MYSQL_PUBLIC_URL, MYSQLHOST, MYSQLPORT } = process.env
-// const dbURL = `mysql://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}`
+const { DB_NAME, DB_HOST, DB_PORT, MONGO_HOST, MONGO_PORT, MONGO_NAME } =
+  process.env
 
-const db = new Sequelize(MYSQL_PUBLIC_URL, {
-  host: MYSQLHOST,
-  dialect: 'mysql',
-  dialectModule: mysql2,
-  logging: false,
-  port: +MYSQLPORT,
-  timezone: '-03:00',
-  database: MYSQL_DATABASE,
-})
+// const dbURL = `mongodb://${DB_HOST}:${DB_PORT}/${DB_NAME}`
+const dbURL = `mongodb://${MONGO_HOST}:${MONGO_PORT}/${MONGO_NAME}`
 
-db.authenticate()
-  .then(() => {
-    console.log('Conexión a la base de datos establecida.')
-  })
-  .catch((error) => {
-    console.error('No se pudo conectar a la base de datos:', error)
-  })
+export const connectDB = async () => {
+  console.log(dbURL)
 
-export default db
+  try {
+    await mongoose.connect(dbURL)
+    console.log('Conexión a la base de datos MongoDB establecida.')
+  } catch (error) {
+    console.error('Error al conectar a la base de datos MongoDB:', error)
+    throw error
+  }
+}
+
+export default mongoose
