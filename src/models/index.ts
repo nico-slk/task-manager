@@ -1,1 +1,1 @@
-export { default as TaskModel } from './task.model'
+export { default as TaskSchema } from './task.model'

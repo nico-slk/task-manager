@@ -6,7 +6,7 @@ import fsPromises from 'fs/promises'
 import { createServer, Server as ServerNode } from 'http'
 import morgan from 'morgan'
 import path from 'path'
-import db from '../connection/db'
+import { connectDB } from '../connection/db'
 import { ApiPaths } from '../routes'
 
 dotenv.config()
@@ -26,8 +26,7 @@ export class Server {
 
   async dbConnection() {
     try {
-      await db.authenticate()
-      await db.sync({ alter: true })
+      await connectDB()
       console.log('Database online')
     } catch (error) {
       throw new Error(error as string)
@@ -43,7 +42,7 @@ export class Server {
 
   routes() {
     ApiPaths.forEach(async ({ url, router }) => {
-      const filePath = path.resolve(__dirname, '../routes', `${router}.ts`)
+      const filePath = path.resolve(__dirname, '../routes', `${router}.js`)
 
       try {
         await fsPromises.access(filePath, fs.constants.F_OK)

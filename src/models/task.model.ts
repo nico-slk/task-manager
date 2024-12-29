@@ -1,24 +1,31 @@
-import { DataTypes } from 'sequelize'
-import db from '../connection/db'
+import mongoose from 'mongoose'
 
-const Task = db.define('task', {
-  id: {
-    type: DataTypes.UUID,
-    autoIncrement: true,
-    primaryKey: true,
+const TaskSchema = new mongoose.Schema(
+  {
+    id: {
+      type: String,
+      default: () => new mongoose.Types.ObjectId().toString(),
+      unique: true,
+      required: true,
+    },
+    title: {
+      type: String,
+      required: true,
+    },
+    description: {
+      type: String,
+      required: true,
+    },
+    status: {
+      type: Boolean,
+      default: false,
+    },
   },
-  title: {
-    type: DataTypes.STRING,
-    allowNull: false,
+  {
+    timestamps: true,
   },
-  description: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  status: {
-    type: DataTypes.BOOLEAN,
-    defaultValue: false,
-  },
-})
+)
+
+const Task = mongoose.model('Task', TaskSchema)
 
 export default Task
