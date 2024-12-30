@@ -1,13 +1,7 @@
-import mongoose from 'mongoose'
+import mongoose from 'mongoose';
 
 const UserSchema = new mongoose.Schema(
   {
-    id: {
-      type: String,
-      default: () => new mongoose.Types.ObjectId().toString(),
-      unique: true,
-      required: true,
-    },
     nickname: {
       type: String,
       unique: true,
@@ -27,8 +21,8 @@ const UserSchema = new mongoose.Schema(
   {
     timestamps: true,
   },
-)
+);
 
-const Task = mongoose.model('User', UserSchema)
+const Task = mongoose.model('User', UserSchema);
 
-export default Task
+export default Task;
