@@ -1,47 +1,42 @@
-import { Router } from 'express'
-import { body } from 'express-validator'
-import AuthService from '../services/auth.service'
-import { ValidJWT, ValidateRequest } from '../utils'
+import { Router } from 'express';
+import { body } from 'express-validator';
+import AuthService from '../services/auth.service';
+import { ValidateRequest, ValidEmail, ValidPassword } from '../utils';
 
-const { signIn, registerUser } = AuthService
-const { validJwt } = ValidJWT
-const { validateRequest } = ValidateRequest
+const { signIn, registerUser } = AuthService;
+const { validateRequest } = ValidateRequest;
+const { isValidEmail } = ValidEmail;
+const { isValidPassword } = ValidPassword;
 
-const router = Router()
+const router = Router();
 
 const emailValidation = body('email')
   .isEmail()
-  .withMessage('El correo electrónico debe tener un formato válido')
-  .normalizeEmail()
+  .custom(isValidEmail)
+  .withMessage('El correo electrónico debe tener un formato válido');
 
 const passwordValidation = body('password')
   .isLength({ min: 8, max: 16 })
   .withMessage('La contraseña debe tener entre 8 y 16 caracteres')
-  .matches(/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])/)
+  .custom(isValidPassword)
   .withMessage(
     'La contraseña debe incluir al menos una letra mayúscula, una letra minúscula, un número y un carácter especial',
-  )
+  );
 
-const usernameValidation = body('username')
+const usernameValidation = body('nickname')
   .optional()
   .isString()
-  .withMessage('El nombre de usuario debe ser un texto')
+  .withMessage('El nombre de usuario debe ser un texto');
 
 router.post(
-  '/signin',
-  [emailValidation, passwordValidation, validJwt, validateRequest],
+  '/login',
+  [emailValidation, passwordValidation, validateRequest],
   signIn,
-)
+);
 router.post(
   '/register',
-  [
-    emailValidation,
-    passwordValidation,
-    usernameValidation,
-    validJwt,
-    validateRequest,
-  ],
+  [usernameValidation, emailValidation, passwordValidation, validateRequest],
   registerUser,
-)
+);
 
-export default router
+export default router;
